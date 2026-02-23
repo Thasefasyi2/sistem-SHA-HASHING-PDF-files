@@ -1,0 +1,21 @@
+# buat windows
+> download postgrest 
+> setup password
+> buat db = 
+>> CREATE DATABASE pdf_verification;
+
+> ganti password di .env sesuai dengan setup
+
+> targetin flask ke app.py = 
+>> set FLASK_APP=app.py
+
+> init db app.py pakai flask =
+>> flask init-db
+
+> buat admin di flask =
+>> flask create-admin
+
+> baut user di flask =
+>> flask create-user
+
+python app.py
