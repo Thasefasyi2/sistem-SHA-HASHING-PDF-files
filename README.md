@@ -1,21 +1,10 @@
-# 📄 PDF Verification System
+# PDF Verification System
 
 Sistem verifikasi akses file PDF menggunakan Python, Flask, dan PostgreSQL. File PDF yang diupload oleh admin akan terkunci dan hanya dapat diakses oleh user yang memiliki kode akses (bodyteks) yang valid.
 
 ---
 
-## ✨ Fitur Utama
-
-- **🔐 Keamanan SHA256**: Verifikasi integritas file dengan hashing SHA256
-- **🔑 Secret Key**: Kunci rahasia disimpan di server (.env)
-- **📱 QR Code**: Generate dan scan QR Code untuk akses cepat
-- **👥 Role-based Access**: Admin dan User dengan hak akses berbeda
-- **🔒 Password Hashing**: Menggunakan bcrypt untuk keamanan password
-- **📂 Local Storage**: Penyimpanan file PDF di folder lokal
-
----
-
-## 🏗️ Arsitektur Sistem
+## Arsitektur Sistem
 
 ```
 Internet
@@ -31,7 +20,7 @@ storage/pdf/
 
 ---
 
-## 📋 Prasyarat (Yang Harus Diinstall)
+## Yang Harus Diinstall
 
 ### 1. Python 3.8+
 Download dan install dari: https://www.python.org/downloads/
@@ -49,7 +38,7 @@ Biasanya sudah terinstall bersama Python.
 
 ---
 
-## 🚀 Instalasi dan Setup
+## Instalasi dan Setup
 
 ### Step 1: Clone/Download Project
 ```bash
@@ -131,7 +120,7 @@ flask create-user
 
 ---
 
-## ▶️ Menjalankan Aplikasi
+## Menjalankan Aplikasi
 
 ### Development Mode
 ```bash
@@ -152,7 +141,7 @@ gunicorn -w 4 -b 0.0.0.0:5000 app:app
 
 ---
 
-## 📖 Cara Penggunaan
+## Penggunaan
 
 ### Untuk Admin:
 
@@ -176,7 +165,7 @@ gunicorn -w 4 -b 0.0.0.0:5000 app:app
 
 ---
 
-## 🔐 Konsep Keamanan
+## Konsep Keamanan
 
 ### Proses Upload (Admin)
 
@@ -202,7 +191,7 @@ gunicorn -w 4 -b 0.0.0.0:5000 app:app
 
 ---
 
-## 📁 Struktur Folder
+## Struktur Folder
 
 ```
 pdf_verification_system/
@@ -233,7 +222,7 @@ pdf_verification_system/
 
 ---
 
-## 🛠️ Troubleshooting
+## Troubleshooting
 
 ### Error: "Database does not exist"
 **Solusi:** Pastikan database `pdf_verification` sudah dibuat di PostgreSQL
@@ -252,7 +241,7 @@ flask run -p 5001
 
 ---
 
-## 🔧 Konfigurasi Cloudflare Tunnel (Opsional)
+## Konfigurasi Cloudflare Tunnel (Opsional)
 
 Untuk expose aplikasi ke internet dengan aman:
 
@@ -283,7 +272,7 @@ cloudflared tunnel run pdf-verification
 
 ---
 
-## 📝 Daftar Lengkap Dependensi
+## Daftar Lengkap Dependensi
 
 | Package | Version | Kegunaan |
 |---------|---------|----------|
@@ -298,32 +287,8 @@ cloudflared tunnel run pdf-verification
 
 ---
 
-## 🔒 Security Best Practices
+## Lisensi
 
-1. **Ganti SECRET_KEY** sebelum deploy ke production
-2. **Gunakan HTTPS** untuk komunikasi aman
-3. **Jangan expose PostgreSQL** ke internet (localhost only)
-4. **Gunakan password kuat** untuk admin dan user
-5. **Backup database** secara berkala
-6. **Batasi ukuran file** upload (default: 16MB)
-7. **Validasi file type** (hanya PDF yang diizinkan)
+Project ini open dan dokumentasi dibuat untuk keperluan verifikasi dokumen PDF dengan sistem keamanan SHA256.
 
 ---
-
-## 📞 Support
-
-Jika ada masalah atau pertanyaan, silakan:
-1. Periksa bagian Troubleshooting di atas
-2. Cek log error di terminal
-3. Verifikasi konfigurasi `.env`
-4. Pastikan PostgreSQL berjalan
-
----
-
-## 📄 Lisensi
-
-Project ini dibuat untuk keperluan verifikasi dokumen PDF dengan sistem keamanan SHA256.
-
----
-
-**Selamat menggunakan PDF Verification System! 🎉**
