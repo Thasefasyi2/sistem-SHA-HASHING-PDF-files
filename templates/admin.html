@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - PDF Verification System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .navbar-brand .icon {
+            font-size: 28px;
+        }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .role-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .btn-logout {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        /* Page Title */
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: #666;
+        }
+
+        /* Upload Section */
+        .upload-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .upload-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .upload-form {
+            display: grid;
+            gap: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="file"] {
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 30px;
+            border: 2px dashed #ccc;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #666;
+        }
+
+        .file-input-label:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .file-input-label.has-file {
+            border-color: #4caf50;
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .btn-upload {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            justify-self: start;
+        }
+
+        .btn-upload:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        /* QR Code Section */
+        .qr-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .qr-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .qr-code-container {
+            display: inline-block;
+            padding: 20px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .qr-code-container img {
+            max-width: 250px;
+            height: auto;
+        }
+
+        .bodyteks-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .qr-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #555;
+            border: none;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* PDF List Section */
+        .pdf-list-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .pdf-list-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pdf-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .pdf-table th,
+        .pdf-table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .pdf-table th {
+            color: #666;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .pdf-table tr:hover {
+            background: #f8f9ff;
+        }
+
+        .pdf-icon {
+            font-size: 24px;
+        }
+
+        .pdf-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .pdf-meta {
+            color: #888;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .hash-display {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #666;
+            background: #f5f5f5;
+            padding: 8px 12px;
+            border-radius: 8px;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-locked {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .status-verified {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .btn-delete {
+            background: #ffebee;
+            color: #c62828;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-delete:hover {
+            background: #ef5350;
+            color: white;
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .alert-danger {
+            background: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+        }
+
+        .alert-success {
+            background: #efe;
+            color: #2e7d32;
+            border: 1px solid #cfc;
+        }
+
+        .alert-warning {
+            background: #fff3e0;
+            color: #e65100;
+            border: 1px solid #ffe0b2;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #888;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .pdf-table {
+                font-size: 14px;
+            }
+
+            .pdf-table th,
+            .pdf-table td {
+                padding: 12px;
+            }
+
+            .hash-display {
+                max-width: 100px;
+            }
+
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <span class="icon">📄</span>
+            <span>PDF Verification System</span>
+        </div>
+        <div class="navbar-user">
+            <span>{{ session.email }}</span>
+            <span class="role-badge">{{ session.role }}</span>
+            <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="page-header">
+            <h1>Admin Panel</h1>
+            <p>Kelola file PDF dan generate kode akses untuk user</p>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Upload Section -->
+        <div class="upload-section">
+            <h2>📤 Upload PDF Baru</h2>
+            <form class="upload-form" method="POST" action="{{ url_for('upload_pdf') }}" enctype="multipart/form-data">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="bodyteks">Bodyteks (Kode Akses)</label>
+                        <input 
+                            type="text" 
+                            id="bodyteks" 
+                            name="bodyteks" 
+                            placeholder="Contoh: GRATISONGKIR2026" 
+                            required
+                            oninput="this.value = this.value.toUpperCase()"
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label>File PDF</label>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="pdf_file" name="pdf_file" accept=".pdf" required onchange="updateFileLabel(this)">
+                            <label for="pdf_file" class="file-input-label" id="fileLabel">
+                                <span>📁</span>
+                                <span>Klik untuk pilih file PDF</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn-upload">Upload PDF & Generate QR Code</button>
+            </form>
+        </div>
+
+        <!-- QR Code Section (Shown after upload) -->
+        {% if show_qr %}
+        <div class="qr-section">
+            <h2>✅ PDF Berhasil Diupload!</h2>
+            <div class="bodyteks-display">{{ bodyteks }}</div>
+            <div class="qr-code-container">
+                <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code">
+            </div>
+            <p style="color: #666; margin-bottom: 20px;">Scan QR code ini atau masukkan kode di atas untuk mengakses PDF</p>
+            <div class="qr-actions">
+                <a href="data:image/png;base64,{{ qr_code }}" download="qr_{{ bodyteks }}.png" class="btn-action btn-primary">
+                    📥 Download QR Code
+                </a>
+                <button onclick="window.print()" class="btn-action btn-secondary">
+                    🖨️ Print QR Code
+                </button>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- PDF List Section -->
+        <div class="pdf-list-section">
+            <h2>📋 Daftar File PDF</h2>
+            
+            {% if pdfs %}
+            <table class="pdf-table">
+                <thead>
+                    <tr>
+                        <th>File</th>
+                        <th>File Hash</th>
+                        <th>SHA Key</th>
+                        <th>Status</th>
+                        <th>Tanggal Upload</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pdf in pdfs %}
+                    <tr>
+                        <td>
+                            <div class="pdf-icon">📄</div>
+                            <div class="pdf-name">{{ pdf.file_name }}</div>
+                            <div class="pdf-meta">by {{ pdf.creator_email or 'Unknown' }}</div>
+                        </td>
+                        <td>
+                            <div class="hash-display" title="{{ pdf.file_hash }}">
+                                {{ pdf.file_hash[:20] }}...
+                            </div>
+                        </td>
+                        <td>
+                            <div class="hash-display" title="{{ pdf.sha_key }}">
+                                {{ pdf.sha_key[:20] }}...
+                            </div>
+                        </td>
+                        <td>
+                            <span class="status-badge status-locked">
+                                🔒 Terkunci
+                            </span>
+                        </td>
+                        <td>{{ pdf.created_at.strftime('%d %b %Y, %H:%M') }}</td>
+                        <td>
+                            <a href="{{ url_for('view_qr', pdf_id=pdf.id) }}" class="btn-action btn-primary">
+                                🔍 Lihat QR</a>
+                            <form method="POST" action="{{ url_for('delete_pdf', pdf_id=pdf.id) }}" onsubmit="return confirm('Yakin ingin menghapus PDF ini?');">
+                                <button type="submit" class="btn-delete">🗑️ Hapus</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">📂</div>
+                <h3>Belum ada file PDF</h3>
+                <p>Upload file PDF pertama Anda menggunakan form di atas</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function updateFileLabel(input) {
+            const label = document.getElementById('fileLabel');
+            if (input.files && input.files[0]) {
+                label.innerHTML = `<span>✅</span><span>${input.files[0].name}</span>`;
+                label.classList.add('has-file');
+            } else {
+                label.innerHTML = `<span>📁</span><span>Klik untuk pilih file PDF</span>`;
+                label.classList.remove('has-file');
+            }
+        }
+    </script>
+</body>
+</html>

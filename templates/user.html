@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Panel - PDF Verification System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .navbar-brand .icon {
+            font-size: 28px;
+        }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .role-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .btn-logout {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        /* Page Title */
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: #666;
+        }
+
+        /* Instructions */
+        .instructions {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+        }
+
+        .instructions h3 {
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+
+        .instructions li {
+            margin-bottom: 5px;
+        }
+
+        /* PDF Gallery */
+        .gallery-section {
+            margin-bottom: 30px;
+        }
+
+        .gallery-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pdf-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .pdf-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .pdf-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .pdf-card-header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            padding: 25px;
+            text-align: center;
+            color: white;
+        }
+
+        .pdf-card-header.unlocked {
+            background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+        }
+
+        .pdf-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .pdf-status {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+        }
+
+        .pdf-card-body {
+            padding: 25px;
+        }
+
+        .pdf-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            word-break: break-word;
+        }
+
+        .pdf-meta {
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        /* Verification Form */
+        .verify-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .verify-input {
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            text-align: center;
+            letter-spacing: 2px;
+            font-weight: 600;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        .verify-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-verify {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-verify:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-scan {
+            background: #f0f0f0;
+            color: #555;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-scan:hover {
+            background: #e0e0e0;
+        }
+
+        /* Action Buttons (when unlocked) */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: none;
+        }
+
+        .btn-preview {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-download {
+            background: #4caf50;
+            color: white;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* QR Scanner Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .modal-header p {
+            color: #666;
+        }
+
+        .qr-input-manual {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 18px;
+            text-align: center;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .qr-input-manual:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-modal {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-confirm {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-cancel {
+            background: #f0f0f0;
+            color: #555;
+        }
+
+        .btn-modal:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 20px 25px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            z-index: 1001;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            max-width: 350px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #f44336 0%, #c62828 100%);
+        }
+
+        /* PDF Preview Modal */
+        .preview-modal .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .preview-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .preview-header h3 {
+            font-size: 16px;
+        }
+
+        .preview-frame {
+            width: 100%;
+            height: 80vh;
+            border: none;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: white;
+            border-radius: 16px;
+        }
+
+        .empty-state-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #888;
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .alert-danger {
+            background: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+        }
+
+        .alert-success {
+            background: #efe;
+            color: #2e7d32;
+            border: 1px solid #cfc;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .pdf-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <span class="icon">📄</span>
+            <span>PDF Verification System</span>
+        </div>
+        <div class="navbar-user">
+            <span>{{ session.email }}</span>
+            <span class="role-badge">{{ session.role }}</span>
+            <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="page-header">
+            <h1>Gallery PDF</h1>
+            <p>Akses file PDF dengan memasukkan kode verifikasi</p>
+        </div>
+
+        <!-- Instructions -->
+        <div class="instructions">
+            <h3>📋 Cara Mengakses PDF:</h3>
+            <ol>
+                <li>Masukkan <strong>bodyteks (kode akses)</strong> yang diberikan admin</li>
+                <li>Atau scan <strong>QR Code</strong> menggunakan tombol Scan QR</li>
+                <li>Klik <strong>Verifikasi</strong> untuk membuka akses</li>
+                <li>Setelah terverifikasi, Anda dapat <strong>Preview</strong> atau <strong>Download</strong> PDF</li>
+            </ol>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- PDF Gallery -->
+        <div class="gallery-section">
+            <h2>📚 Daftar File PDF</h2>
+            
+            {% if pdfs %}
+            <div class="pdf-grid" id="pdfGrid">
+                {% for pdf in pdfs %}
+                <div class="pdf-card" data-pdf-id="{{ pdf.id }}">
+                    <div class="pdf-card-header" id="header-{{ pdf.id }}">
+                        <div class="pdf-icon">🔒</div>
+                        <div class="pdf-status">TERKUNCI</div>
+                    </div>
+                    <div class="pdf-card-body">
+                        <div class="pdf-name">{{ pdf.file_name }}</div>
+                        <div class="pdf-meta">Diupload: {{ pdf.created_at.strftime('%d %b %Y') }}</div>
+                        
+                        <!-- Verification Form -->
+                        <div class="verify-section" id="verify-{{ pdf.id }}">
+                            <form class="verify-form" onsubmit="verifyPDF(event, {{ pdf.id }})">
+                                <input 
+                                    type="text" 
+                                    class="verify-input" 
+                                    id="bodyteks-{{ pdf.id }}"
+                                    placeholder="MASUKKAN KODE" 
+                                    required
+                                    oninput="this.value = this.value.toUpperCase()"
+                                >
+                                <button type="submit" class="btn-verify">🔓 Verifikasi</button>
+                                <button type="button" class="btn-scan" onclick="openQRModal({{ pdf.id }})">
+                                    📷 Scan QR Code
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Action Buttons (Hidden by default) -->
+                        <div class="action-buttons" id="actions-{{ pdf.id }}" style="display: none;">
+                            <button class="btn-action btn-preview" onclick="previewPDF({{ pdf.id }})">
+                                👁️ Preview
+                            </button>
+                            <a class="btn-action btn-download" id="download-{{ pdf.id }}">
+                                📥 Download
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">📂</div>
+                <h3>Belum ada file PDF</h3>
+                <p>Hubungi admin untuk mengupload file PDF</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- QR Scanner Modal -->
+    <div class="modal" id="qrModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📷 Scan QR Code</h3>
+                <p>Arahkan kamera ke QR Code dari admin</p>
+            </div>
+
+            <div id="qr-reader" style="width:100%; margin-bottom:20px;"></div>
+
+            <div class="modal-actions">
+                <button class="btn-modal btn-cancel" onclick="closeQRModal()">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF Preview Modal -->
+    <div class="modal preview-modal" id="previewModal">
+        <div class="modal-content">
+            <div class="preview-header">
+                <h3 id="previewTitle">Preview PDF</h3>
+                <button class="btn-close" onclick="closePreview()">✕</button>
+            </div>
+            <iframe class="preview-frame" id="previewFrame"></iframe>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
+    <script>
+        let currentPdfId = null;
+        // di sini localstorage
+        const verifiedPdfs = new Set(
+            JSON.parse(localStorage.getItem("verifiedPdfs") || "[]")
+        );
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        async function verifyPDF(event, pdfId) {
+            event.preventDefault();
+            
+            const bodyteks = document.getElementById(`bodyteks-${pdfId}`).value;
+            
+            if (!bodyteks) {
+                showNotification('Masukkan kode akses!', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('{{ url_for("verify_access") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `pdf_id=${pdfId}&bodyteks=${encodeURIComponent(bodyteks)}`
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Update UI to unlocked state
+                    unlockPDF(pdfId, data);
+                    verifiedPdfs.add(pdfId);
+                    localStorage.setItem(
+                    "verifiedPdfs",
+                    JSON.stringify([...verifiedPdfs])
+                );
+                    showNotification('✅ Akses diberikan! PDF telah terbuka.', 'success');
+                } else {
+                    showNotification(data.message || '❌ Kode akses salah!', 'error');
+                }
+            } catch (error) {
+                showNotification('Terjadi kesalahan. Coba lagi.', 'error');
+            }
+        }
+
+        // buat QR nya
+        let html5QrCode;
+
+        function openQRModal(pdfId) {
+            currentPdfId = pdfId;
+            document.getElementById('qrModal').classList.add('active');
+
+            html5QrCode = new Html5Qrcode("qr-reader");
+
+            html5QrCode.start(
+                { facingMode: { exact: "environment" } }, // 🔥 Kamera belakang
+                {
+                    fps: 10,
+                    qrbox: 250
+                },
+                qrCodeMessage => {
+                    handleScannedQR(qrCodeMessage);
+                },
+                errorMessage => {
+                    // ignore
+                }
+            ).catch(err => {
+                showNotification("Tidak bisa mengakses kamera belakang", "error");
+            });
+        }
+
+        function closeQRModal() {
+            document.getElementById('qrModal').classList.remove('active');
+            currentPdfId = null;
+
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    html5QrCode.clear();
+                }).catch(err => console.error(err));
+            }
+        }
+
+        async function handleScannedQR(bodyteks) {
+            if (!currentPdfId) return;
+
+            try {
+                const response = await fetch('{{ url_for("scan_qr") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        pdf_id: currentPdfId,
+                        bodyteks: bodyteks.toUpperCase()
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    unlockPDF(currentPdfId, data);
+                    verifiedPdfs.add(currentPdfId);
+                    localStorage.setItem(
+                    "verifiedPdfs",
+                    JSON.stringify([...verifiedPdfs])
+                );
+                    closeQRModal();
+                    showNotification("✅ QR Code valid! PDF terbuka.", "success");
+                } else {
+                    showNotification(data.message || "QR tidak valid", "error");
+                }
+
+            } catch (error) {
+                showNotification("Terjadi kesalahan", "error");
+            }
+        }
+        function unlockPDF(pdfId, data) {
+            // Update header
+            const header = document.getElementById(`header-${pdfId}`);
+            header.classList.add('unlocked');
+            header.innerHTML = `
+                <div class="pdf-icon">🔓</div>
+                <div class="pdf-status">TERBUKA</div>
+            `;
+
+            // Hide verify form
+            document.getElementById(`verify-${pdfId}`).style.display = 'none';
+
+            // Show action buttons
+            const actions = document.getElementById(`actions-${pdfId}`);
+            actions.style.display = 'flex';
+
+            // Set download link
+            document.getElementById(`download-${pdfId}`).href = data.download_url;
+        }
+
+        function previewPDF(pdfId) {
+            const modal = document.getElementById('previewModal');
+            const frame = document.getElementById('previewFrame');
+            const title = document.getElementById('previewTitle');
+            
+            frame.src = `{{ url_for('preview_pdf', pdf_id=0) }}`.replace('0', pdfId);
+            title.textContent = 'Preview PDF';
+            modal.classList.add('active');
+        }
+
+        function closePreview() {
+            const modal = document.getElementById('previewModal');
+            const frame = document.getElementById('previewFrame');
+            
+            frame.src = '';
+            modal.classList.remove('active');
+        }
+
+        // Close modals on outside click
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    if (modal.id === 'qrModal') closeQRModal();
+                    if (modal.id === 'previewModal') closePreview();
+                }
+            });
+        });
+
+        // baca localstorage
+        window.addEventListener("DOMContentLoaded", () => {
+            verifiedPdfs.forEach(pdfId => {
+                const header = document.getElementById(`header-${pdfId}`);
+                const verifySection = document.getElementById(`verify-${pdfId}`);
+                const actions = document.getElementById(`actions-${pdfId}`);
+
+                if (header && verifySection && actions) {
+                    header.classList.add('unlocked');
+                    header.innerHTML = `
+                        <div class="pdf-icon">🔓</div>
+                        <div class="pdf-status">TERBUKA</div>
+                    `;
+                    verifySection.style.display = 'none';
+                    actions.style.display = 'flex';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

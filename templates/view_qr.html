@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QR Detail</title>
+</head>
+<body style="text-align:center; font-family:sans-serif;">
+
+    <h2>Detail QR Code</h2>
+
+    <h3>Bodyteks</h3>
+    <p style="font-size:20px; font-weight:bold;">{{ pdf.bodyteks }}</p>
+
+    <h3>QR Code</h3>
+    <img src="data:image/png;base64,{{ qr_code }}">
+
+    <h3>File Hash</h3>
+    <p>{{ pdf.file_hash }}</p>
+
+    <h3>SHA Key</h3>
+    <p>{{ pdf.sha_key }}</p>
+
+    <br><br>
+    <a href="{{ url_for('admin_panel') }}">⬅ Kembali</a>
+
+</body>
+</html>
